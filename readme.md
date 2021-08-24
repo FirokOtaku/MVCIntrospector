@@ -1,7 +1,10 @@
 # MVC Introspector
 
 基于 Annotation Processing Tool 技术, 工作于编译期,  
-为 SpringBoot 生成一整套 MVC CRUD 结构.
+为 SpringBoot 生成一整套 MVC CRUD 结构.  
+(包含 mapper, service, service impl, controller)
+
+[Readme - English](readme-en.md)
 
 ## 使用方式
 
@@ -62,4 +65,10 @@
 
 此外, 您需要正确提供数据库驱动等依赖, 否则项目可能无法正常运行.
 
-MVCI 仅于 **Java16 环境** 下经过测试. 更低 Java 版本中仍可能使用, 但是您需要手动调整 `firok.spring.mvci.MVCIntrospectProcessor` 上的 `@SupportedSourceVersion` 注解值.
+MVCI 仅于 **Java16 环境** 下通过测试. 更低 Java 版本中仍可能使用, 但是您需要手动调整 `firok.spring.mvci.MVCIntrospectProcessor` 上的 `@SupportedSourceVersion` 注解值和部分 MVCI 代码.
+
+## 变动记录
+
+### 1.0.0
+
+* 实现基本功能
