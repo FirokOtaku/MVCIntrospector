@@ -50,24 +50,20 @@
 
 ## 注意
 
-**MVCI 本身** 不基于 SpringBoot 和 MybatisPlus, 但是 **MVCI 默认的结构代码模板** 基于 SpringBoot 和 MybatisPlus.  
+**MVCI 本身** 不基于 SpringBoot 和 MybatisPlus,  
+但是 **MVCI 默认的结构代码模板** 基于 SpringBoot 和 MybatisPlus.    
 所以默认情况下需为编译环境引入相关依赖, 否则项目无法通过编译.
 
-一个可用的依赖配置为:  
+此外, 还需要正确提供数据库驱动等依赖, 否则项目可能无法正常运行.
 
-```xml
-<dependency>
-  <groupId>com.baomidou</groupId>
-  <artifactId>mybatis-plus-boot-starter</artifactId>
-  <version>3.4.3.2</version>
-</dependency>
-```
-
-此外, 您需要正确提供数据库驱动等依赖, 否则项目可能无法正常运行.
-
-MVCI 仅于 **Java16 环境** 下通过测试. 更低 Java 版本中仍可能使用, 但是您需要手动调整 `firok.spring.mvci.MVCIntrospectProcessor` 上的 `@SupportedSourceVersion` 注解值和部分 MVCI 代码.
+MVCI 仅于 **Java17 环境** 下通过测试.  
+更低 Java 版本中仍可能使用, 但是您需要手动调整 `firok.spring.mvci.MVCIntrospectProcessor` 上的 `@SupportedSourceVersion` 注解值和部分 MVCI 代码.
 
 ## 变动记录
+
+### 17.0.0
+
+* 提升JDK支持版本至17
 
 ### 1.0.0
 

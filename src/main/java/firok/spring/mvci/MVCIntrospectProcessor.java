@@ -16,7 +16,7 @@ import java.util.Set;
 import static firok.spring.mvci.Constants.DISABLE;
 
 @SupportedAnnotationTypes("firok.spring.mvci.MVCIntrospective")
-@SupportedSourceVersion(SourceVersion.RELEASE_16)
+@SupportedSourceVersion(SourceVersion.RELEASE_17)
 public class MVCIntrospectProcessor extends AbstractProcessor
 {
 	private Types typeUtils;
