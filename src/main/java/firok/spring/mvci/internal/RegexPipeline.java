@@ -6,7 +6,7 @@ import java.util.regex.Pattern;
 
 public class RegexPipeline
 {
-	public static String pipelineAll(String content, Map<String, String> mapParams, Map<String, String> extras)
+	public static String pipelineAll(String content, Map<String, String> mapParams)
 	{
 		for(var entryParam : mapParams.entrySet())
 		{
@@ -16,18 +16,6 @@ public class RegexPipeline
 			Pattern regexPattern = getPattern(regexString);
 
 			content = regexPattern.matcher(content).replaceAll(replacement);
-		}
-		if(extras != null)
-		{
-			for(var entryParam : extras.entrySet())
-			{
-				String regexString = entryParam.getKey();
-				String replacement = entryParam.getValue();
-
-				Pattern regexPattern = getPattern(regexString);
-
-				content = regexPattern.matcher(content).replaceAll(replacement);
-			}
 		}
 		return content;
 	}

@@ -128,6 +128,7 @@ public @interface MVCIntrospective
 	 * <p>标明为此实体生成 mapper 时使用的名称模板.</p>
 	 * <p>indicate the name template to be used when generating mapper for this bean.</p>
 	 * <p>
+	 *     <i>resources/mapper.name.txt</i>
 	 *     <code>##BEAN_NAME_SHORT##Mapper</code> : <code>TestBean</code> → <code>TestMapper</code>
 	 * </p>
 	 */
@@ -138,6 +139,7 @@ public @interface MVCIntrospective
 	 * <p>标明为此实体生成 service 时使用的名称模板.</p>
 	 * <p>indicate the name template to be used when generating service for this bean.</p>
 	 * <p>
+	 *     <i>resources/service.name.txt</i>
 	 *     <code>##BEAN_NAME_SHORT##Service</code> : <code>TestBean</code> → <code>TestService</code>
 	 * </p>
 	 */
@@ -148,6 +150,7 @@ public @interface MVCIntrospective
 	 * <p>标明为此实体生成 service impl 时使用的名称模板.</p>
 	 * <p>indicate the name to be used when generating service impl for this bean.</p>
 	 * <p>
+	 *     <i>resources/service_impl.name.txt</i>
 	 *     <code>##BEAN_NAME_SHORT##ServiceImpl</code> : <code>TestBean</code> → <code>TestServiceImpl</code>
 	 * </p>
 	 */
@@ -158,6 +161,7 @@ public @interface MVCIntrospective
 	 * <p>标明为此实体生成 controller 时使用的名称模板.</p>
 	 * <p>indicate the name to be used when generating controller for this bean.</p>
 	 * <p>
+	 *     <i>resources/controller.name.txt</i>
 	 *     <code>##BEAN_NAME_SHORT##Controller</code> : <code>TestBean</code> → <code>TestController</code>
 	 * </p>
 	 */
@@ -169,16 +173,36 @@ public @interface MVCIntrospective
 	/**
 	 * <p>标明为此实体生成 mapper 时的目标包位置.</p>
 	 * <p>indicate the target package when generating mapper for this bean.</p>
+	 *
+	 * <i>resources/mapper.package.txt</i>
 	 */
 	@AvailableValues({ PREFER_DEFAULT, DEFAULT, CUSTOM })
 	String templateMapperPackage() default PREFER_DEFAULT;
 
+	/**
+	 * <p>标明为此实体生成 mapper 时的目标包位置.</p>
+	 * <p>indicate the target package when generating mapper for this bean.</p>
+	 *
+	 * <i>resources/service.package.txt</i>
+	 */
 	@AvailableValues({ PREFER_DEFAULT, DEFAULT, CUSTOM })
 	String templateServicePackage() default PREFER_DEFAULT;
 
+	/**
+	 * <p>标明为此实体生成 service 时的目标包位置.</p>
+	 * <p>indicate the target package when generating service for this bean.</p>
+	 *
+	 * <i>resources/service_impl.package.txt</i>
+	 */
 	@AvailableValues({ PREFER_DEFAULT, DEFAULT, CUSTOM })
 	String templateServiceImplPackage() default PREFER_DEFAULT;
 
+	/**
+	 * <p>标明为此实体生成 controller 时的目标包位置.</p>
+	 * <p>indicate the target package when generating controller for this bean.</p>
+	 *
+	 * <i>resources/controller.package.txt</i>
+	 */
 	@AvailableValues({ PREFER_DEFAULT, DEFAULT, CUSTOM })
 	String templateControllerPackage() default PREFER_DEFAULT;
 
@@ -187,6 +211,8 @@ public @interface MVCIntrospective
 	/**
 	 * <p>标明为此实体生成 mapper 时使用的模板.</p>
 	 * <p>indicate the template to be used when generating mapper for this bean.</p>
+	 *
+	 * <i>resources/mapper.java.txt</i>
 	 */
 	@AvailableValues({ PREFER_DEFAULT, DEFAULT, CUSTOM })
 	String templateMapperContent() default PREFER_DEFAULT;
@@ -194,6 +220,8 @@ public @interface MVCIntrospective
 	/**
 	 * <p>标明为此实体生成 service 时使用的模板.</p>
 	 * <p>indicate the template to be used when generating service for this bean.</p>
+	 *
+	 * <i>resources/service.java.txt</i>
 	 */
 	@AvailableValues({ PREFER_DEFAULT, DEFAULT, CUSTOM })
 	String templateServiceContent() default PREFER_DEFAULT;
@@ -201,6 +229,8 @@ public @interface MVCIntrospective
 	/**
 	 * <p>标明为此实体生成 service impl 时使用的模板.</p>
 	 * <p>indicate the template to be used when generating service impl for this bean.</p>
+	 *
+	 * <i>resources/service_impl.java.txt</i>
 	 */
 	@AvailableValues({ PREFER_DEFAULT, DEFAULT, CUSTOM })
 	String templateServiceImplContent() default PREFER_DEFAULT;
@@ -208,6 +238,8 @@ public @interface MVCIntrospective
 	/**
 	 * <p>标明为此实体生成 controller 时使用的模板.</p>
 	 * <p>indicate the template to be used when generating controller for this bean.</p>
+	 *
+	 * <i>resources/controller.java.txt</i>
 	 */
 	@AvailableValues({ PREFER_DEFAULT, DEFAULT, CUSTOM })
 	String templateControllerContent() default PREFER_DEFAULT;

@@ -151,17 +151,19 @@ public class BeanContext
 
 	private void single(String valueKey, String valueTemplate, Map<String, String> extras)
 	{
-		mapExtraParams.put(valueKey, RegexPipeline.pipelineAll(valueTemplate, mapExtraParams, extras));
+		String value = RegexPipeline.pipelineAll(valueTemplate, mapExtraParams);
+		if(extras != null) value = RegexPipeline.pipelineAll(value, extras);
+		mapExtraParams.put(valueKey, value);
 	}
 	private void single(String valueKey, String valueTemplate)
 	{
-		mapExtraParams.put(valueKey, RegexPipeline.pipelineAll(valueTemplate, mapExtraParams, null));
+		mapExtraParams.put(valueKey, RegexPipeline.pipelineAll(valueTemplate, mapExtraParams));
 	}
 	private void write(String valueKeyLocation, String valueKeyName, String templateContent) throws Exception
 	{
 		String valueLocation = mapExtraParams.get(valueKeyLocation);
 		String valueName = mapExtraParams.get(valueKeyName);
-		String valueContent = RegexPipeline.pipelineAll(templateContent, mapExtraParams, null);
+		String valueContent = RegexPipeline.pipelineAll(templateContent, mapExtraParams);
 		try(var writer = mvci.createSourceFileWrite(valueLocation + "." + valueName))
 		{
 			writer.write(valueContent);
