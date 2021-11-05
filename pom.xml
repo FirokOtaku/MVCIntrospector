@@ -6,8 +6,15 @@
 
     <groupId>firok.spring</groupId>
     <artifactId>mvci</artifactId>
-    <version>17.0.0</version>
+    <version>17.1.0</version>
     <description>An annotation processing tool to generate MVC code from JavaBean(s).</description>
+    <dependencies>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.22</version>
+        </dependency>
+    </dependencies>
 
     <properties>
         <java.version>17</java.version>
@@ -35,6 +42,21 @@
             </plugin>
 
         </plugins>
+
+        <resources>
+<!--            <resource>-->
+<!--                <directory>${basedir}/src/java</directory>-->
+<!--                <includes>-->
+<!--                    <include>**/*</include>-->
+<!--                </includes>-->
+<!--            </resource>-->
+            <resource>
+                <directory>${basedir}/src/main/resources</directory>
+                <includes>
+                    <include>*.txt</include>
+                </includes>
+            </resource>
+        </resources>
     </build>
 
 

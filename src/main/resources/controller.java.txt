@@ -1,0 +1,92 @@
+package ##CONTROLLER_PACKAGE##;
+
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.web.bind.annotation.*;
+
+import java.io.*;
+import java.util.*;
+
+import ##BEAN_PACKAGE##.##BEAN_NAME_FULL##;
+import ##MAPPER_PACKAGE##.##MAPPER_NAME##;
+
+@RestController
+@RequestMapping("/##BEAN_NAME_FULL##")
+@EnableTransactionManagement
+public class ##CONTROLLER_NAME## {
+
+    @Autowired
+    protected ServiceImpl<##MAPPER_NAME##,##BEAN_NAME_FULL##> service;
+
+    @PostMapping("/insert")
+    public ResponseEntity<Boolean> insert(
+            @RequestBody ##BEAN_NAME_FULL## entity
+    ) {
+        return ResponseEntity.ok(service.save(entity));
+    }
+
+    @PostMapping("/insertBatch")
+    public ResponseEntity<Boolean> insertBatch(
+            @RequestBody List<##BEAN_NAME_FULL##> entityList
+    ) {
+        return ResponseEntity.ok(service.saveBatch(entityList));
+    }
+
+    @PostMapping("/updateById")
+    public ResponseEntity<Boolean> updateById(
+            @RequestBody ##BEAN_NAME_FULL## entity
+    ) {
+        return ResponseEntity.ok(service.updateById(entity));
+    }
+
+    @PostMapping("/updateByIds")
+    public ResponseEntity<Boolean> updateByIds(
+            @RequestBody List<##BEAN_NAME_FULL##> entityList
+    ) {
+        return ResponseEntity.ok(service.updateBatchById(entityList));
+    }
+
+    @DeleteMapping("/removeById")
+    public ResponseEntity<Boolean> removeById(
+            @RequestParam(name = "id") Serializable id
+    ) {
+        return ResponseEntity.ok(service.removeById(id));
+    }
+
+    @GetMapping("/getById")
+    public ResponseEntity<##BEAN_NAME_FULL##> getById(
+            @RequestParam(name = "id") Serializable id
+    ) {
+        return ResponseEntity.ok(service.getById(id));
+    }
+
+    @GetMapping("/getByIds")
+    public ResponseEntity<List<##BEAN_NAME_FULL##>> getByIds(
+            @RequestParam(name = "id") List<Serializable> ids
+    ) {
+        return ResponseEntity.ok(service.listByIds(ids));
+    }
+
+    @PostMapping("/getByEntity")
+    public ResponseEntity<List<##BEAN_NAME_FULL##>> getByEntity(
+            @RequestBody ##BEAN_NAME_FULL## entity
+    ) {
+        return ResponseEntity.ok(service.list(new QueryWrapper<>(entity)));
+    }
+
+    @PostMapping("/getPageByEntity")
+    public ResponseEntity<IPage<##BEAN_NAME_FULL##>> getPageByEntity(
+            @RequestBody ##BEAN_NAME_FULL## entity,
+            @RequestParam(name = "pageNum",defaultValue = "1") int pageNum,
+            @RequestParam(name = "pageSize",defaultValue = "10") int pageSize
+    ) {
+        IPage<##BEAN_NAME_FULL##> page = new Page<>(pageNum,pageSize);
+        QueryWrapper<##BEAN_NAME_FULL##> qw = new QueryWrapper<>(entity);
+        return ResponseEntity.ok(service.page(page,qw));
+    }
+}

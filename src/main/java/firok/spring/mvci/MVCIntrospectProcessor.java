@@ -1,21 +1,27 @@
 package firok.spring.mvci;
 
-import firok.spring.mvci.internal.IntrospectContext;
+import firok.spring.mvci.internal.BeanContext;
+import lombok.SneakyThrows;
 
 import javax.annotation.processing.*;
 import javax.lang.model.SourceVersion;
-import javax.lang.model.element.Element;
+import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 import javax.tools.Diagnostic;
 import javax.tools.JavaFileObject;
 import java.io.Writer;
+import java.lang.annotation.Annotation;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
-import static firok.spring.mvci.Constants.DISABLE;
-
-@SupportedAnnotationTypes("firok.spring.mvci.MVCIntrospective")
+@SupportedAnnotationTypes({
+		"firok.spring.mvci.MVCIntrospective",
+		"firok.spring.mvci.MVCConfig",
+})
 @SupportedSourceVersion(SourceVersion.RELEASE_17)
 public class MVCIntrospectProcessor extends AbstractProcessor
 {
@@ -50,67 +56,128 @@ public class MVCIntrospectProcessor extends AbstractProcessor
 		messager.printMessage(Diagnostic.Kind.NOTE,"MVC Introspector ADT 初始化完成");
 	}
 
-	private void genJavaSource(String location,String content) throws Exception
+	/**
+	 * 省得出问题 还是加上个锁吧
+	 */
+	private static final Object LOCK_JFO_API = new Object();
+	public Writer createSourceFileWrite(String location) throws Exception
 	{
-		JavaFileObject jfo = filer.createSourceFile(location);
-		try(Writer jw = jfo.openWriter())
+		JavaFileObject jfo;
+		synchronized (LOCK_JFO_API) { jfo = filer.createSourceFile(location); return jfo.openWriter(); }
+
+	}
+
+	@SneakyThrows
+	private void checkAnnotation(Annotation anno)
+	{
+		var classAnno = anno.getClass();
+		for(var field : classAnno.getDeclaredMethods()) // 注解字段 = 方法
 		{
-			jw.write(content);
+//			printNote("field:"+field.getName());
+			AvailableValues annoAVs;
+			synchronized (LOCK_REFLECT_API) { annoAVs = field.getAnnotation(AvailableValues.class); }
+			if(annoAVs == null) {
+//				printNote("continue;");
+				continue;
+			}
+
+			Object fieldValue = field.invoke(anno);
+			assert fieldValue != null;
+
+			boolean passCheck = false;
+			for(var av : annoAVs.value())
+			{
+				if(Constants.CUSTOM.equals(av) || Objects.equals(av, fieldValue))
+				{
+					passCheck = true;
+					break;
+				}
+			}
+
+			if(!passCheck)
+			{
+				printError("错误的值[%s]于[%s]注解的[%s]字段".formatted(
+						fieldValue,
+						classAnno.getSimpleName(),
+						field.getName()
+				));
+			}
 		}
 	}
+
+	/**
+	 * JDK的反射api看起来不是线程安全的, 加一个全局锁省得炸裂
+	 */
+	public static final Object LOCK_REFLECT_API = new Object();
 
 	@Override
 	public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv)
 	{
-		Set<? extends Element> setElements = roundEnv.getElementsAnnotatedWith(MVCIntrospective.class);
-		printNote("读取并处理 MVC 结构");
-		for(Element ele : setElements)
+		try
 		{
-			if(ele instanceof TypeElement te)
-			{
-				var anno = ele.getAnnotation(MVCIntrospective.class);
-				var context = new IntrospectContext(te,anno);
+			var setAnno = roundEnv.getElementsAnnotatedWith(MVCIntrospective.class);
+			if(setAnno.isEmpty()) return true;
 
-				try
+			setAnno.stream().parallel().forEach(ele -> {
+				if(ele instanceof TypeElement eleBean)
 				{
-					String content; // content to generate
-					String qn; // qualified name
-					GEN_MAPPER:
-					{
-						if(DISABLE.equals(anno.mapperTemplate())) break GEN_MAPPER;
-						content = context.pipeline(anno.mapperTemplate());
-						qn = context.mapperPackage + "." + context.mapperName;
-						genJavaSource(qn,content);
-					}
-					GEN_SERVICE:
-					{
-						if(DISABLE.equals(anno.serviceTemplate())) break GEN_SERVICE;
-						content = context.pipeline(anno.serviceTemplate());
-						qn = context.servicePackage + "." + context.serviceName;
-						genJavaSource(qn,content);
-					}
-					GEN_SERVICE_IMPL:
-					{
-						if(DISABLE.equals(anno.serviceImplTemplate())) break GEN_SERVICE_IMPL;
-						content = context.pipeline(anno.serviceImplTemplate());
-						qn = context.serviceImplPackage + "." + context.serviceImplName;
-						genJavaSource(qn,content);
-					}
-					GEN_CONTROLLER:
-					{
-						if(DISABLE.equals(anno.controllerTemplate())) break GEN_CONTROLLER;
-						content = context.pipeline(anno.controllerTemplate());
-						qn = context.controllerPackage + "." + context.controllerName;
-						genJavaSource(qn,content);
-					}
-				}
-				catch (Exception e)
-				{
-					printError("为 [%s] 生成结构失败: %s".formatted(context.beanNameFull,e.getLocalizedMessage()));
-				}
+					List<MVCIntrospective> configs = new ArrayList<>();
 
-				printNote("为 [%s] 生成结构成功".formatted(context.beanNameFull));
-			}
+					MVCIntrospective annoBean;
+					synchronized (LOCK_REFLECT_API) { annoBean = eleBean.getAnnotation(MVCIntrospective.class); }
+					checkAnnotation(annoBean);
+					configs.add(annoBean);
+
+					// 读取相关的配置
+
+					final String beanFullName = eleBean.getQualifiedName().toString(); // a.b.c.d.E
+					String beanPackageName = beanFullName.substring(0, beanFullName.lastIndexOf('.')); // a.b.c.d
+					if(beanPackageName.lastIndexOf('.') > 0) do
+					{
+						// 寻找配置注解
+						PackageElement elePackage;
+						synchronized (LOCK_REFLECT_API) { elePackage = elementUtils.getPackageElement(beanPackageName); }
+
+						if(elePackage != null)
+						{
+							MVCIntrospective annoConfig;
+							synchronized (LOCK_REFLECT_API) { annoConfig = elePackage.getAnnotation(MVCIntrospective.class); }
+
+							if(annoConfig != null)
+							{
+								checkAnnotation(annoConfig);
+								configs.add(annoConfig);
+							}
+						}
+
+						// 准备寻找上级package
+						final int indexLastDot = beanPackageName.lastIndexOf('.');
+						if(indexLastDot > 0)
+							beanPackageName = beanPackageName.substring(0, indexLastDot);
+						else // 当前package限定名已经是根package了
+							beanPackageName = null;
+					}
+					while(beanPackageName != null);
+
+					// 此时, 列表内的配置是由近而远
+					// 在根据配置调整生成时, 前面的配置会覆盖后面的配置
+
+					// 初始化上下文
+					var context = new BeanContext(configs, eleBean, this);
+
+					// 开始生成
+					context.generate();
+				}
+			});
+		}
+		catch (Exception e)
+		{
+//			if(e.getStackTrace() != null)
+//				for(var st : e.getStackTrace())
+//				{
+//					printWarning(st.toString());
+//				}
+			printError(e);
 		}
 
 		return true;
