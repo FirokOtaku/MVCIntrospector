@@ -149,20 +149,35 @@ public class BeanContext
 		return defaultValue.get();
 	}
 
+	private void single(String valueKey, String valueTemplate, Map<String, String> extras)
+	{
+		mapExtraParams.put(valueKey, RegexPipeline.pipelineAll(valueTemplate, mapExtraParams, extras));
+	}
 	private void single(String valueKey, String valueTemplate)
 	{
-		mapExtraParams.put(valueKey, RegexPipeline.pipelineAll(valueTemplate, mapExtraParams));
+		mapExtraParams.put(valueKey, RegexPipeline.pipelineAll(valueTemplate, mapExtraParams, null));
 	}
 	private void write(String valueKeyLocation, String valueKeyName, String templateContent) throws Exception
 	{
 		String valueLocation = mapExtraParams.get(valueKeyLocation);
 		String valueName = mapExtraParams.get(valueKeyName);
-		String valueContent = RegexPipeline.pipelineAll(templateContent, mapExtraParams);
+		String valueContent = RegexPipeline.pipelineAll(templateContent, mapExtraParams, null);
 		try(var writer = mvci.createSourceFileWrite(valueLocation + "." + valueName))
 		{
 			writer.write(valueContent);
 			writer.flush();
 		}
+	}
+	private static final Map<String, String> paramMapper = new HashMap<>();
+	private static final Map<String, String> paramService = new HashMap<>();
+	private static final Map<String, String> paramServiceImpl = new HashMap<>();
+	private static final Map<String, String> paramController = new HashMap<>();
+	static
+	{
+		paramMapper.put("\\.entity\\.|\\.bean\\.",".mapper.");
+		paramService.put("\\.entity\\.|\\.bean\\.",".service.");
+		paramServiceImpl.put("\\.entity\\.|\\.bean\\.",".service_impl.");
+		paramController.put("\\.entity\\.|\\.bean\\.",".controller.");
 	}
 
 	@SneakyThrows
@@ -183,15 +198,10 @@ public class BeanContext
 			beanNameShort = beanNameFull.substring(0,beanNameFull.length()-6);
 		else beanNameShort = beanNameFull;
 		String beanPackage = beanQualifiedName.substring(0, beanQualifiedNameLastDot);
-		String basePackage;
-		if(beanPackage.endsWith(".entity")) basePackage = beanPackage.substring(0, beanPackage.length() - 7);
-		else if(beanPackage.endsWith(".bean")) basePackage = beanPackage.substring(0, beanPackage.length() - 5);
-		else basePackage = beanPackage;
 
 		mapExtraParams.put(BEAN_NAME_FULL, beanNameFull);
 		mapExtraParams.put(BEAN_NAME_SHORT, beanNameShort);
 		mapExtraParams.put(BEAN_PACKAGE, beanPackage);
-		mapExtraParams.put(BASE_PACKAGE, basePackage);
 
 		// 根据配置 处理各种参数
 		shouldMapper = should(configs, MVCIntrospective::generateMapper);
@@ -220,10 +230,10 @@ public class BeanContext
 		single(SERVICE_IMPL_NAME, templateServiceImplName);
 		single(CONTROLLER_NAME, templateControllerName);
 
-		single(MAPPER_PACKAGE, templateMapperPackage);
-		single(SERVICE_PACKAGE, templateServicePackage);
-		single(SERVICE_IMPL_PACKAGE, templateServiceImplPackage);
-		single(CONTROLLER_PACKAGE, templateControllerPackage);
+		single(MAPPER_PACKAGE, templateMapperPackage, paramMapper);
+		single(SERVICE_PACKAGE, templateServicePackage, paramService);
+		single(SERVICE_IMPL_PACKAGE, templateServiceImplPackage, paramServiceImpl);
+		single(CONTROLLER_PACKAGE, templateControllerPackage, paramController);
 
 		// 生成代码文件
 		if(shouldMapper) write(MAPPER_PACKAGE, MAPPER_NAME, templateMapper);

@@ -5,7 +5,6 @@ public final class Constants
 	public static final String BEAN_NAME_FULL = "##BEAN_NAME_FULL##";
 	public static final String BEAN_NAME_SHORT = "##BEAN_NAME_SHORT##";
 	public static final String BEAN_PACKAGE = "##BEAN_PACKAGE##";
-	public static final String BASE_PACKAGE = "##BASE_PACKAGE##";
 
 	public static final String MAPPER_NAME = "##MAPPER_NAME##";
 	public static final String SERVICE_NAME = "##SERVICE_NAME##";

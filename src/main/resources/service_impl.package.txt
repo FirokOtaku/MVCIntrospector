@@ -1,1 +1,1 @@
-##BASE_PACKAGE##.service_impl
+##BEAN_PACKAGE##

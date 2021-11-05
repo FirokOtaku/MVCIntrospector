@@ -1,1 +1,1 @@
-##BASE_PACKAGE##.mapper
+##BEAN_PACKAGE##
