@@ -4,7 +4,7 @@
 为 SpringBoot 生成一整套 MVC CRUD 结构.  
 (包含 mapper, service, service impl, controller)
 
-[Readme - English](readme-en.md) (尚未更新至17.1.x)
+[Readme - English](readme-en.md)
 
 ## 使用方式
 
@@ -22,7 +22,7 @@
 
 `@MVCIntrospective` 有多个字段可供配置, 各字段配置含义在 [Javadoc 中](/src/main/java/firok/spring/mvci/MVCIntrospective.java) 有详细描述.
 
-大部分字段标注了 `@AvailableValues`注解, 这描述了相关字段可接受的值.  
+大部分字段标注了 `@AvailableValues` 注解, 这描述了相关字段可接受的值.  
 如果 `@AvailableValues` 中包含 `Constants.CUSTOM`, 则表示此字段可以提供任意自定义值 (一般是自定义模板字符串);  
 否则只能为此字段提供预设值之一, 提供其它值会使得代码无法通过编译.
 
@@ -38,7 +38,7 @@
 
 修改 `@MVCIntrospective` 注解中的 `templateXXX` 值即可调整相关的生成模板.
 
-默认的模板存放在 `resources` 目录下.
+> 默认的模板存放在 `resources` 目录下
 
 根据模板生成内容时, 如下键会被替换:  
 
@@ -56,7 +56,7 @@
 `##SERVICE_IMPL_PACKAGE##` | Service Impl 位置 | `firok.spring.demo.service.impl`
 `##CONTROLLER_PACKAGE##` | Controller 位置 | `firok.spring.demo.controller`
 
-虽然大部分 **替换键** 的 **替换值** 也是根据模板生成的, 但我们不对生成相关 **替换值** 的顺序做任何保证, 在调整这些 **替换键模板** 时请 **不要** 使用除了 `##BEAN_NAME_FULL##`, `##BEAN_NAME_SHORT##` 和 `##BEAN_PACKAGE##` 之外的 **替换键**.
+大部分 **替换键** 的 **替换值** 也是根据模板生成的, 但我们不对生成相关 **替换值** 的顺序做任何保证, 在调整这些 **替换键模板** 时请 **不要** 使用除了 `##BEAN_NAME_FULL##`, `##BEAN_NAME_SHORT##` 和 `##BEAN_PACKAGE##` 之外的 **替换键**.
 
 生成各 `##XXX_PACKAGE##` 替换值时, 会多执行一次额外替换, 替换内容是将 `\.entity|bean\.` 替换为 `.mapper.`, `.service.`, `.service_impl.` 或 `.controller.`.
 
@@ -67,7 +67,7 @@
 
 > 假如在 `a.b` 包上指定了 `##TEST## = "test"`,  
 > 假如在 `a.b.c` 包上指定了 `##TEST## = "test2"`,  
-> 在 `a.b.c.TestBean` 上指定了 `##TEST## = "test3"`,  
+> 假如在 `a.b.c.TestBean` 上指定了 `##TEST## = "test3"`,  
 > 生成 `a.b.c.TestBean` 实体时将使用 `##TEST## = "test3"`,  
 > 生成 `a.b.c.Test2Bean` 实体时将使用 `##TEST## = "test2"`,  
 > 生成 `a.b.DemoBean` 实体时将使用 `##TEST## = "test"`

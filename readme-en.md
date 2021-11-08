@@ -18,13 +18,22 @@ can generate whole set of MVC CRUD code for SpringBoot during compiling.
 
 ### How to customize generation templates
 
-Just edit `xxxTemplate` value in `@MVCIntrospective`.
+`@MVCIntrospective` has multiple configurable fields. Each of them has detailed description at [Javadoc](/src/main/java/firok/spring/mvci/MVCIntrospective.java).
 
-> Resetting any of those values to `firok.spring.mvci.Constants.DISABLE` (`"##DISABLE##"`) will disable generating that code
+Most of those fields are annotated with `@AvailableValues` annotation, which  describes the acceptable values of the relevant fields. A field can take any custom value (usually for a template string), if `Constants.CUSTOM` is listed in a `@AvailableValues`. Or any other non-listed values would cause compile error.
 
-> If you do not want to write a long string template for many times, you could define that value as a `public static final String` field and use it in annotation.
+`PREFER_XXX` values means that those values could be overrided by upper configs. `DEFAULT` means the default value (usually a default template string) would be taken.
 
-Default templates are stored in `firok.spring.mvci.internal.DefaultXXXTemplate`.
+`@MVCIntrospective` can be annotated on `class` or `package`.  
+When generating for a bean class, we would search from children packages to parent packages to find any `@MVCIntrospective`. Then decide each value of fields.
+
+> Hope you know what is `package-info.java`
+
+### Replacing-key-value-pair for templates
+
+You could adjust templates by editing `templateXXX` fields in `@MVCIntrospective`.
+
+> default templates are stored in `resources` folder
 
 When customizing templates, keys below will be replaced:
 
@@ -42,26 +51,45 @@ Key | Meaning | Example
 `##SERVICE_IMPL_PACKAGE##` | service impl package | `firok.spring.demo.service.impl`
 `##CONTROLLER_PACKAGE##` | controller package | `firok.spring.demo.controller`
 
-### How to customize generation names
+Most of **replacing-value** of **replacing-key** are generated from templates. However, we do not guarantee the order in which the **replacing-values** are generated.
 
-Editing `xxxPackage` of `@MVCIntrospective` would change the package to generate; Editing `xxxName` would change the name to generate.
+An extra replacement would be taken when generating `XXX_PACKAGE##`, which would replace the `\.entity|bean\.` to `.mapper.`, `.service.`, `.service_impl.` or `.controller.`.
+
+> For a bean class `a.b.c.entity.d.e.TestEntity`,  
+> package for controller should be `a.b.c.controller.d.e`
+
+Except default replacing-key-value-pairs, you could create custom ones by editing `extraParams` of `@MVCIntrospective`. If multiple configs contain the same **replacing-key**, the **replacing-value** closer to bean class definition would be adopted.
+
+> `a.b` → `##TEST## = "test"`  
+> `a.b.c` → `##TEST## = "test2"`,  
+> `a.b.c.TestBean` → `##TEST## = "test3"`,  
+> `a.b.c.TestBean` ← `##TEST## = "test3"`,  
+> `a.b.c.Test2Bean` ← `##TEST## = "test2"`,  
+> `a.b.DemoBean` ← `##TEST## = "test"`
 
 ## Something else
 
 **MVCI itself** is not based on SpringBoot and MybatisPlus. But **the default templates used by MVCI** is based on SpringBoot and MybatisPlus.  
 By default, you should import them as dependencies, or the project will not pass the compilation.
 
-A usable maven dependency is:  
-
-```xml
-<dependency>
-  <groupId>com.baomidou</groupId>
-  <artifactId>mybatis-plus-boot-starter</artifactId>
-  <version>3.4.3.2</version>
-</dependency>
-```
-
 In addition, you need to properly import dependencies such as database drivers, or your project may not work properly.
 
-MVCI has only passed testing under **Java16**. It may work in lower version of Java. But you may need to edit the `@SupportedSourceVersion` value of `firok.spring.mvci.MVCIntrospectProcessor` and some code of MVCI.
+MVCI has only passed testing under **Java17**. It may work in lower version of Java. But you may need to edit the `@SupportedSourceVersion` value of `firok.spring.mvci.MVCIntrospectProcessor` and some code of MVCI.
 
+## Changelog
+
+### 17.1.1
+
+* minor code improvements
+
+### 17.1.0
+
+* now we could adjust generation on package level
+
+### 17.0.0
+
+* increased supported JDK version to 17
+
+### 1.0.0
+
+* implemented base functions
