@@ -1,0 +1,9 @@
+package firok.spring.mvci.runtime;
+
+public final class Current##TYPE_NAME##Names
+{
+	private Current##TYPE_NAME##Names() throws InstantiationException { throw new InstantiationException("不允许初始化"); }
+
+	public static final String[] NAMES = new String[] { ##NAMES_NAME##
+    };
+}

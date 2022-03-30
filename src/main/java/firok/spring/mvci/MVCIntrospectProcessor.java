@@ -1,6 +1,9 @@
 package firok.spring.mvci;
 
 import firok.spring.mvci.internal.BeanContext;
+import firok.spring.mvci.internal.RegexPipeline;
+import firok.spring.mvci.internal.ResourceCache;
+import firok.spring.mvci.internal.RuntimeGenerate;
 import lombok.SneakyThrows;
 
 import javax.annotation.processing.*;
@@ -11,13 +14,13 @@ import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 import javax.tools.Diagnostic;
 import javax.tools.JavaFileObject;
+import javax.tools.StandardLocation;
+import java.io.IOException;
 import java.io.Writer;
 import java.lang.annotation.Annotation;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
+@SuppressWarnings({"unused", "FieldCanBeLocal"})
 @SupportedAnnotationTypes({
 		"firok.spring.mvci.MVCIntrospective",
 		"firok.spring.mvci.MVCConfig",
@@ -29,15 +32,15 @@ public class MVCIntrospectProcessor extends AbstractProcessor
 	private Elements elementUtils;
 	private Filer filer;
 	private Messager messager;
-	private void printNote(Object obj)
+	public void printNote(Object obj)
 	{
 		messager.printMessage(Diagnostic.Kind.NOTE,"[MVCI] " + obj);
 	}
-	private void printWarning(Object obj)
+	public void printWarning(Object obj)
 	{
 		messager.printMessage(Diagnostic.Kind.WARNING,"[MVCI] " + obj);
 	}
-	private void printError(Object obj)
+	public void printError(Object obj)
 	{
 		messager.printMessage(Diagnostic.Kind.ERROR,"[MVCI] " + obj);
 	}
@@ -60,13 +63,14 @@ public class MVCIntrospectProcessor extends AbstractProcessor
 	 * 省得出问题 还是加上个锁吧
 	 */
 	private static final Object LOCK_JFO_API = new Object();
-	public Writer createSourceFileWrite(String location) throws Exception
+	public Writer createSourceFileWrite(String location) throws IOException
 	{
 		JavaFileObject jfo;
 		synchronized (LOCK_JFO_API) { jfo = filer.createSourceFile(location); return jfo.openWriter(); }
 
 	}
 
+	@SuppressWarnings("ReflectionForUnavailableAnnotation")
 	@SneakyThrows
 	private void checkAnnotation(Annotation anno)
 	{
@@ -118,6 +122,9 @@ public class MVCIntrospectProcessor extends AbstractProcessor
 			var setAnno = roundEnv.getElementsAnnotatedWith(MVCIntrospective.class);
 			if(setAnno.isEmpty()) return true;
 
+			// 所有生成的实体数据
+			var listContext = new Vector<BeanContext>();
+
 			setAnno.stream().parallel().forEach(ele -> {
 				if(ele instanceof TypeElement eleBean)
 				{
@@ -167,19 +174,22 @@ public class MVCIntrospectProcessor extends AbstractProcessor
 
 					// 开始生成
 					context.generate();
+					listContext.add(context);
 				}
 			});
+
+			// 根据实体数据生成runtime类
+			printNote("开始生成运行时内容...");
+			RuntimeGenerate.startGenAll(listContext, this);
+
+			printNote("完成生成");
 		}
 		catch (Exception e)
 		{
-//			if(e.getStackTrace() != null)
-//				for(var st : e.getStackTrace())
-//				{
-//					printWarning(st.toString());
-//				}
 			printError(e);
 		}
 
 		return true;
 	}
+
 }

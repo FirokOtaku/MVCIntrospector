@@ -1,5 +1,6 @@
 package firok.spring.mvci.internal;
 
+import firok.spring.mvci.Constants;
 import firok.spring.mvci.MVCIntrospectProcessor;
 import firok.spring.mvci.MVCIntrospective;
 import firok.spring.mvci.Param;
@@ -7,7 +8,6 @@ import lombok.SneakyThrows;
 
 import javax.lang.model.element.TypeElement;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -19,28 +19,28 @@ public class BeanContext
 	final List<MVCIntrospective> configs;
 	final MVCIntrospectProcessor mvci;
 
-	Map<String, String> mapExtraParams = new HashMap<>();
+	public Map<String, String> mapExtraParams = new HashMap<>();
 
 //	String basePackage;
 //	String beanNameShort;
 //	String beanNameFull;
 
-	boolean shouldMapper;
-	boolean shouldService;
-	boolean shouldServiceImpl;
-	boolean shouldController;
-	String templateMapperName;
-	String templateServiceName;
-	String templateServiceImplName;
-	String templateControllerName;
-	String templateMapperPackage;
-	String templateServicePackage;
-	String templateServiceImplPackage;
-	String templateControllerPackage;
-	String templateMapper;
-	String templateService;
-	String templateServiceImpl;
-	String templateController;
+	public boolean shouldMapper;
+	public boolean shouldService;
+	public boolean shouldServiceImpl;
+	public boolean shouldController;
+	public String templateMapperName;
+	public String templateServiceName;
+	public String templateServiceImplName;
+	public String templateControllerName;
+	public String templateMapperPackage;
+	public String templateServicePackage;
+	public String templateServiceImplPackage;
+	public String templateControllerPackage;
+	public String templateMapper;
+	public String templateService;
+	public String templateServiceImpl;
+	public String templateController;
 
 
 	public BeanContext(List<MVCIntrospective> configs, TypeElement eleBean, MVCIntrospectProcessor mvci)
@@ -52,6 +52,58 @@ public class BeanContext
 		// 为当前实体创建参数上下文
 		for(var config : configs)
 			readExtraParams(config.extraParams());
+
+		final String beanQualifiedName = eleBean.getQualifiedName().toString();
+		final int beanQualifiedNameLastDot = beanQualifiedName.lastIndexOf(".");
+
+		String beanNameFull = nonDefault(configs, MVCIntrospective::beanNameFull, ()-> beanQualifiedName.substring(beanQualifiedNameLastDot + 1));
+		String beanNameShort;
+		if(beanNameFull.startsWith("Bean"))
+			beanNameShort = beanNameFull.substring(4);
+		else if(beanNameFull.startsWith("Entity"))
+			beanNameShort = beanNameFull.substring(6);
+		else if(beanNameFull.endsWith("Bean"))
+			beanNameShort = beanNameFull.substring(0,beanNameFull.length()-4);
+		else if(beanNameFull.endsWith("Entity"))
+			beanNameShort = beanNameFull.substring(0,beanNameFull.length()-6);
+		else beanNameShort = beanNameFull;
+		String beanPackage = beanQualifiedName.substring(0, beanQualifiedNameLastDot);
+
+		mapExtraParams.put(BEAN_NAME_FULL, beanNameFull);
+		mapExtraParams.put(BEAN_NAME_SHORT, beanNameShort);
+		mapExtraParams.put(BEAN_PACKAGE, beanPackage);
+
+		// 根据配置 处理各种参数
+		shouldMapper = should(configs, MVCIntrospective::generateMapper);
+		shouldService = should(configs, MVCIntrospective::generateService);
+		shouldServiceImpl = should(configs, MVCIntrospective::generateServiceImpl);
+		shouldController = should(configs, MVCIntrospective::generateController);
+
+		// 根据配置 加载模板
+		templateMapperName = templateOrResource(configs, MVCIntrospective::templateMapperName, "mapper.name");
+		templateServiceName = templateOrResource(configs, MVCIntrospective::templateServiceName, "service.name");
+		templateServiceImplName = templateOrResource(configs, MVCIntrospective::templateServiceImplName, "service_impl.name");
+		templateControllerName = templateOrResource(configs, MVCIntrospective::templateControllerName, "controller.name");
+
+		templateMapperPackage = templateOrResource(configs, MVCIntrospective::templateMapperPackage, "mapper.package");
+		templateServicePackage = templateOrResource(configs, MVCIntrospective::templateServicePackage, "service.package");
+		templateServiceImplPackage = templateOrResource(configs, MVCIntrospective::templateServiceImplPackage, "service_impl.package");
+		templateControllerPackage = templateOrResource(configs, MVCIntrospective::templateControllerPackage, "controller.package");
+
+		templateMapper = shouldMapper ? templateOrResource(configs, MVCIntrospective::templateMapperContent, "mapper.java") : null;
+		templateService = shouldService ? templateOrResource(configs, MVCIntrospective::templateServiceContent, "service.java") : null;
+		templateServiceImpl = shouldServiceImpl ? templateOrResource(configs, MVCIntrospective::templateServiceImplContent, "service_impl.java") : null;
+		templateController = shouldController ? templateOrResource(configs, MVCIntrospective::templateControllerContent, "controller.java") : null;
+
+		single(MAPPER_NAME, templateMapperName);
+		single(SERVICE_NAME, templateServiceName);
+		single(SERVICE_IMPL_NAME, templateServiceImplName);
+		single(CONTROLLER_NAME, templateControllerName);
+
+		single(MAPPER_PACKAGE, templateMapperPackage, paramMapper);
+		single(SERVICE_PACKAGE, templateServicePackage, paramService);
+		single(SERVICE_IMPL_PACKAGE, templateServiceImplPackage, paramServiceImpl);
+		single(CONTROLLER_PACKAGE, templateControllerPackage, paramController);
 	}
 
 
@@ -64,6 +116,9 @@ public class BeanContext
 		}
 	}
 
+	/**
+	 * 根据配置注解判断所需字段是否为真
+	 */
 	private static boolean should(List<MVCIntrospective> configs, Function<MVCIntrospective, String> mapper)
 	{
 		boolean ret = false;
@@ -84,6 +139,9 @@ public class BeanContext
 		}
 		return ret;
 	}
+	/**
+	 * 根据配置注解判断所需字段模板值
+	 */
 	private static String templateOrResource(
 			List<MVCIntrospective> configs,
 			Function<MVCIntrospective, String> mapper,
@@ -102,35 +160,9 @@ public class BeanContext
 					return value;
 			}
 		}
-		return resource(defaultLocation);
+		return ResourceCache.getResourceString(defaultLocation);
 	}
-	private static final Map<String, String> mapCachedResources = new ConcurrentHashMap<>();
-	private static String resource(String location)
-	{
-		return mapCachedResources.computeIfAbsent(location, loc -> {
-			var ret = new StringBuilder();
-			try(var is = Objects.requireNonNull(
-					BeanContext.class.getClassLoader().getResourceAsStream(location + ".txt"),
-					"resource not found: "+location
-			);
-			    var in = new Scanner(is)
-			) {
-				boolean hasNextLine;
-				do
-				{
-					ret.append(in.nextLine());
-					hasNextLine = in.hasNextLine();
-					if(hasNextLine) ret.append('\n');
-				}
-				while (hasNextLine);
-			}
-			catch (Exception e)
-			{
-				throw new RuntimeException(e);
-			}
-			return ret.toString();
-		});
-	}
+
 	private static String nonDefault(List<MVCIntrospective> configs, Function<MVCIntrospective, String> mapper, Supplier<String> defaultValue)
 	{
 		FOR: for(var config : configs)
@@ -185,62 +217,40 @@ public class BeanContext
 	@SneakyThrows
 	public void generate()
 	{
-		final String beanQualifiedName = eleBean.getQualifiedName().toString();
-		final int beanQualifiedNameLastDot = beanQualifiedName.lastIndexOf(".");
-
-		String beanNameFull = nonDefault(configs, MVCIntrospective::beanNameFull, ()-> beanQualifiedName.substring(beanQualifiedNameLastDot + 1));
-		String beanNameShort;
-		if(beanNameFull.startsWith("Bean"))
-			beanNameShort = beanNameFull.substring(4);
-		else if(beanNameFull.startsWith("Entity"))
-			beanNameShort = beanNameFull.substring(6);
-		else if(beanNameFull.endsWith("Bean"))
-			beanNameShort = beanNameFull.substring(0,beanNameFull.length()-4);
-		else if(beanNameFull.endsWith("Entity"))
-			beanNameShort = beanNameFull.substring(0,beanNameFull.length()-6);
-		else beanNameShort = beanNameFull;
-		String beanPackage = beanQualifiedName.substring(0, beanQualifiedNameLastDot);
-
-		mapExtraParams.put(BEAN_NAME_FULL, beanNameFull);
-		mapExtraParams.put(BEAN_NAME_SHORT, beanNameShort);
-		mapExtraParams.put(BEAN_PACKAGE, beanPackage);
-
-		// 根据配置 处理各种参数
-		shouldMapper = should(configs, MVCIntrospective::generateMapper);
-		shouldService = should(configs, MVCIntrospective::generateService);
-		shouldServiceImpl = should(configs, MVCIntrospective::generateServiceImpl);
-		shouldController = should(configs, MVCIntrospective::generateController);
-
-		// 根据配置 加载模板
-		templateMapperName = templateOrResource(configs, MVCIntrospective::templateMapperName, "mapper.name");
-		templateServiceName = templateOrResource(configs, MVCIntrospective::templateServiceName, "service.name");
-		templateServiceImplName = templateOrResource(configs, MVCIntrospective::templateServiceImplName, "service_impl.name");
-		templateControllerName = templateOrResource(configs, MVCIntrospective::templateControllerName, "controller.name");
-
-		templateMapperPackage = templateOrResource(configs, MVCIntrospective::templateMapperPackage, "mapper.package");
-		templateServicePackage = templateOrResource(configs, MVCIntrospective::templateServicePackage, "service.package");
-		templateServiceImplPackage = templateOrResource(configs, MVCIntrospective::templateServiceImplPackage, "service_impl.package");
-		templateControllerPackage = templateOrResource(configs, MVCIntrospective::templateControllerPackage, "controller.package");
-
-		templateMapper = shouldMapper ? templateOrResource(configs, MVCIntrospective::templateMapperContent, "mapper.java") : null;
-		templateService = shouldService ? templateOrResource(configs, MVCIntrospective::templateServiceContent, "service.java") : null;
-		templateServiceImpl = shouldServiceImpl ? templateOrResource(configs, MVCIntrospective::templateServiceImplContent, "service_impl.java") : null;
-		templateController = shouldController ? templateOrResource(configs, MVCIntrospective::templateControllerContent, "controller.java") : null;
-
-		single(MAPPER_NAME, templateMapperName);
-		single(SERVICE_NAME, templateServiceName);
-		single(SERVICE_IMPL_NAME, templateServiceImplName);
-		single(CONTROLLER_NAME, templateControllerName);
-
-		single(MAPPER_PACKAGE, templateMapperPackage, paramMapper);
-		single(SERVICE_PACKAGE, templateServicePackage, paramService);
-		single(SERVICE_IMPL_PACKAGE, templateServiceImplPackage, paramServiceImpl);
-		single(CONTROLLER_PACKAGE, templateControllerPackage, paramController);
-
 		// 生成代码文件
 		if(shouldMapper) write(MAPPER_PACKAGE, MAPPER_NAME, templateMapper);
 		if(shouldService) write(SERVICE_PACKAGE, SERVICE_NAME, templateService);
 		if(shouldServiceImpl) write(SERVICE_IMPL_PACKAGE, SERVICE_IMPL_NAME, templateServiceImpl);
 		if(shouldController) write(CONTROLLER_PACKAGE, CONTROLLER_NAME, templateController);
+	}
+
+	private String cacheBean, cacheMapper, cacheService, cacheServiceImpl, cacheController;
+	public String getBeanFullQualifiedName()
+	{
+		return cacheBean != null ?
+				cacheBean :
+				(cacheBean = mapExtraParams.get(BEAN_PACKAGE) + "." + mapExtraParams.get(BEAN_NAME_FULL));
+	}
+	public String getMapperFullQualifiedName()
+	{
+		return cacheMapper != null ?
+				cacheMapper :
+				(cacheMapper = mapExtraParams.get(MAPPER_PACKAGE) + "." + mapExtraParams.get(MAPPER_NAME));
+	}
+	public String getServiceFullQualifiedName()
+	{
+		return cacheService != null ?
+				cacheService :
+				(cacheService = mapExtraParams.get(SERVICE_PACKAGE) + "." + mapExtraParams.get(SERVICE_NAME));
+	}
+	public String getServiceImplFullQualifiedName()
+	{
+		return cacheServiceImpl != null ? cacheServiceImpl :
+				(cacheServiceImpl = mapExtraParams.get(SERVICE_IMPL_PACKAGE) + "." + mapExtraParams.get(SERVICE_IMPL_NAME));
+	}
+	public String getControllerFullQualifiedName()
+	{
+		return cacheController != null ? cacheController :
+				(cacheController = mapExtraParams.get(CONTROLLER_PACKAGE) + "." + mapExtraParams.get(CONTROLLER_NAME));
 	}
 }

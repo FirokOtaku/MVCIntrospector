@@ -72,7 +72,28 @@
 > 生成 `a.b.c.Test2Bean` 实体时将使用 `##TEST## = "test2"`,  
 > 生成 `a.b.DemoBean` 实体时将使用 `##TEST## = "test"`
 
+### 运行时数据类
+
+`17.2.0` 版本之后的 MVCI 在参与编译时会在 `firok.spring.mvci.runtime` 包下生成数个类,  
+操作这些类可以获取本项目中所有标注了 `@MVCIntrospective` 注解并生成了相应结构的实体信息.
+
+所有信息都按照两种方式存放在 `XXX Names` 和 `XXX Classes` 类内.
+
+> **为什么要以两种方式储存信息**
+>
+> 根据 [虚拟机规范(Java SE 17)对类初始化的描述](https://docs.oracle.com/javase/specs/jls/se17/html/jls-12.html#:~:text=12.4.1.%C2%A0-,When%20Initialization%20Occurs,-A%20class%20or),  
+> 某个类初次实例化之前或其静态字段初次被主动引用之前,  
+> 此类一定会先进行类初始化.  
+> GraalVM 下经测试,  
+> 仅是访问某个类的 Class 对象不会触发其类加载.
+>
+> 为了避免不同编译器或解释器实现可能出现的不同实现,  
+> MVCI 仍储存了一份字符串类型的信息,  
+> 以完全避免期望之外的类加载.
+
 ## 注意
+
+### 关于代码生成模板
 
 **MVCI 本身** 不基于 SpringBoot 和 MybatisPlus,  
 但是 **MVCI 默认的结构代码模板** 基于 SpringBoot 和 MybatisPlus.    
@@ -80,10 +101,27 @@
 
 此外, 还需要正确提供数据库驱动等依赖, 否则项目可能无法正常运行.
 
-MVCI 仅于 **Java17 环境** 下通过测试.  
+### 关于运行时数据类
+
+`firok.spring.mvci.runtime` 包下的各信息类的字段和方法内容会在编译期动态扩展.
+
+* `firok.spring.mvci.runtime.CurrentBeanNames` 和 `firok.spring.mvci.runtime.CurrentBeanClasses` 中  
+  包含有项目中 **所有** 标注了 `@MVCIntrospective` 注解的实体类信息
+* 其它 `firok.spring.mvci.runtime.CurrentXXXNames` 和 `firok.spring.mvci.runtime.CurrentXXXClasses` 中  
+  包含有项目中 **由 MVCI 生成了相应结构** 的实体信息
+
+比如, 如果实体 `TestBean` 没有配置生成 `Controller` 结构, 在 `CurrentControllerNames.NAMES` 数组内就不会包含相应信息, 且使用 `TestBean` 的完整限定名作为参数调用 `#getByFullQualifiedBeanName` 将会返回 `null`.
+
+### 关于 Java 版本
+
+MVCI 17.x 仅于 **Java17 环境** 下通过测试.  
 更低 Java 版本中仍可能使用, 但是您需要手动调整 `firok.spring.mvci.MVCIntrospectProcessor` 上的 `@SupportedSourceVersion` 注解值和部分 MVCI 代码.
 
 ## 变动记录
+
+### 17.2.0
+
+* 现在 MVCI 将会额外生成数个包含生成数据的信息的类
 
 ### 17.1.1
 

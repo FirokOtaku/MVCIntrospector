@@ -1,0 +1,17 @@
+package firok.spring.mvci.runtime;
+
+public final class Current##TYPE_CLASS##Classes
+{
+	private Current##TYPE_CLASS##Classes() throws InstantiationException { throw new InstantiationException("不允许初始化"); }
+
+	public static final Class<?>[] CLASSES = new Class<?>[] { ##CLASSES_CLASS##
+	};
+
+	public static Class<?> getByFullQualifiedBeanName(String fullQualifiedBeanName)
+	{
+		return switch (fullQualifiedBeanName)
+		{ ##SWITCHES_CLASS##
+			default -> null;
+		};
+	}
+}
