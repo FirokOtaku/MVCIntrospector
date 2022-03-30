@@ -8,7 +8,9 @@
 
 ## 使用方式
 
-* 在项目中引入 MVC Introspector 依赖
+* 从 [GitHub releases](https://github.com/351768593/MVCIntrospector/releases) 下载编译好的 .jar,  
+  或 clone repo 后自行执行 `mvn install` 构建安装依赖
+* 在项目中引入 MVCI 依赖
 * 在 `META-INF/services/` 目录下建立文件 `javax.annotation.processing.Processor`  
   内容为
   ```text
@@ -74,10 +76,11 @@
 
 ### 运行时数据类
 
-`17.2.0` 版本之后的 MVCI 在参与编译时会在 `firok.spring.mvci.runtime` 包下生成数个类,  
+_17.2.0_ 版本之后的 MVCI 在参与编译时会在 `firok.spring.mvci.runtime` 包下生成数个类,  
 操作这些类可以获取本项目中所有标注了 `@MVCIntrospective` 注解并生成了相应结构的实体信息.
 
-所有信息都按照两种方式存放在 `XXX Names` 和 `XXX Classes` 类内.
+`Current XXX Names` 以字符串方式储存了对应结构的完整限定名;  
+`Current XXX Classes` 储存了对应结构的 Class 对象.
 
 > **为什么要以两种方式储存信息**
 >
@@ -110,7 +113,9 @@
 * 其它 `firok.spring.mvci.runtime.CurrentXXXNames` 和 `firok.spring.mvci.runtime.CurrentXXXClasses` 中  
   包含有项目中 **由 MVCI 生成了相应结构** 的实体信息
 
-比如, 如果实体 `TestBean` 没有配置生成 `Controller` 结构, 在 `CurrentControllerNames.NAMES` 数组内就不会包含相应信息, 且使用 `TestBean` 的完整限定名作为参数调用 `#getByFullQualifiedBeanName` 将会返回 `null`.
+比如, 如果实体 `TestBean` 没有配置生成 `Controller` 结构,  
+在 `CurrentControllerNames.NAMES` 数组内就不会包含相应信息,  
+且使用 `TestBean` 的完整限定名作为参数调用 `#getByFullQualifiedBeanName` 将会返回 `null`.
 
 ### 关于 Java 版本
 
