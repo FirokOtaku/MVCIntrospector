@@ -117,6 +117,10 @@ MVCI has only passed testing under **Java17**. It may work in lower version of J
 
 ## Changelog
 
+### 17.3.0
+
+* now structures will be generated at correct place
+
 ### 17.2.0
 
 * now MVCI would generate some classes store bean information and structure information

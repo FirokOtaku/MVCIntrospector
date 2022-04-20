@@ -6,7 +6,7 @@
 
     <groupId>firok.spring</groupId>
     <artifactId>mvci</artifactId>
-    <version>17.2.0</version>
+    <version>17.3.0</version>
     <description>An annotation processing tool to generate MVC code from JavaBean(s).</description>
     <dependencies>
         <dependency>

@@ -208,10 +208,10 @@ public class BeanContext
 	private static final Map<String, String> paramController = new HashMap<>();
 	static
 	{
-		paramMapper.put("\\.entity\\.|\\.bean\\.",".mapper.");
-		paramService.put("\\.entity\\.|\\.bean\\.",".service.");
-		paramServiceImpl.put("\\.entity\\.|\\.bean\\.",".service_impl.");
-		paramController.put("\\.entity\\.|\\.bean\\.",".controller.");
+		paramMapper.put("\\.entity|\\.bean",".mapper");
+		paramService.put("\\.entity|\\.bean",".service");
+		paramServiceImpl.put("\\.entity|\\.bean",".service_impl");
+		paramController.put("\\.entity|\\.bean",".controller");
 	}
 
 	@SneakyThrows
