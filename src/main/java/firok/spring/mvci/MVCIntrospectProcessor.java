@@ -1,8 +1,6 @@
 package firok.spring.mvci;
 
 import firok.spring.mvci.internal.BeanContext;
-import firok.spring.mvci.internal.RegexPipeline;
-import firok.spring.mvci.internal.ResourceCache;
 import firok.spring.mvci.internal.RuntimeGenerate;
 import lombok.SneakyThrows;
 
@@ -14,17 +12,14 @@ import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 import javax.tools.Diagnostic;
 import javax.tools.JavaFileObject;
-import javax.tools.StandardLocation;
 import java.io.IOException;
 import java.io.Writer;
 import java.lang.annotation.Annotation;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @SuppressWarnings({"unused", "FieldCanBeLocal"})
-@SupportedAnnotationTypes({
-		"firok.spring.mvci.MVCIntrospective",
-		"firok.spring.mvci.MVCConfig",
-})
+@SupportedAnnotationTypes({"firok.spring.mvci.MVCIntrospective"})
 @SupportedSourceVersion(SourceVersion.RELEASE_17)
 public class MVCIntrospectProcessor extends AbstractProcessor
 {
@@ -120,6 +115,7 @@ public class MVCIntrospectProcessor extends AbstractProcessor
 		try
 		{
 			var setAnno = roundEnv.getElementsAnnotatedWith(MVCIntrospective.class);
+			printNote("本轮找到 %d 个 MVCI 注解".formatted(setAnno.size()));
 			if(setAnno.isEmpty()) return true;
 
 			// 所有生成的实体数据
@@ -183,6 +179,10 @@ public class MVCIntrospectProcessor extends AbstractProcessor
 			RuntimeGenerate.startGenAll(listContext, this);
 
 			printNote("完成生成");
+			printWarning("本次共为 %d 个实体生成结构: [%s]".formatted(
+					listContext.size(),
+					listContext.stream().map(BeanContext::getBeanFullQualifiedName).collect(Collectors.toList())
+			));
 		}
 		catch (Exception e)
 		{

@@ -16,7 +16,7 @@
   ```text
   firok.spring.mvci.MVCIntrospectProcessor
   ```
-* 启用开发环境中的 ADT 功能, 这通常需要在 IDE 中进行配置
+* 启用开发环境中的 APT 功能, 这通常需要在 IDE 中进行配置
 * 为数据库表创建对应的 JavaBean 实体类, 并在 **合适位置** 标注 `@MVCIntrospective` 注解
 * 重新编译并启动项目
 
@@ -123,6 +123,10 @@ MVCI 17.x 仅于 **Java17 环境** 下通过测试.
 更低 Java 版本中仍可能使用, 但是您需要手动调整 `firok.spring.mvci.MVCIntrospectProcessor` 上的 `@SupportedSourceVersion` 注解值和部分 MVCI 代码.
 
 ## 变动记录
+
+### 17.4.0
+
+* 细微代码改动
 
 ### 17.3.0
 

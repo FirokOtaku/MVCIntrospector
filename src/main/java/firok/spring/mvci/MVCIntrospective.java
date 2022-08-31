@@ -51,7 +51,7 @@ import static firok.spring.mvci.Constants.*;
  *
  * @since 1.0.0
  */
-@Retention(RetentionPolicy.CLASS)
+@Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE, ElementType.PACKAGE})
 public @interface MVCIntrospective
 {

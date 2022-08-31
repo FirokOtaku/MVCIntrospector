@@ -16,7 +16,7 @@ can generate whole set of MVC CRUD code for SpringBoot during compiling.
   ```text
   firok.spring.mvci.MVCIntrospectProcessor
   ```
-* Enable ADT in your develop environment
+* Enable APT in your develop environment
 * Create JavaBean(s) marked with `@BeanIntrospective` for database table(s)
 * Re-build and start project
 
@@ -116,6 +116,10 @@ and `#getByFullQualifiedBeanName` would return `null` when passing full qualifie
 MVCI has only passed testing under **Java17**. It may work in lower version of Java. But you may need to edit the `@SupportedSourceVersion` value of `firok.spring.mvci.MVCIntrospectProcessor` and some code of MVCI.
 
 ## Changelog
+
+### 17.4.0
+
+* minor code improvements
 
 ### 17.3.0
 
