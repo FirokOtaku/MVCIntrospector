@@ -6,7 +6,7 @@
 
     <groupId>firok.spring</groupId>
     <artifactId>mvci</artifactId>
-    <version>17.4.0</version>
+    <version>17.5.0</version>
     <description>An annotation processing tool to generate MVC code from JavaBean(s).</description>
     <dependencies>
         <dependency>
@@ -20,6 +20,10 @@
         <java.version>17</java.version>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
+
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
     </properties>
 
     <build>
@@ -38,7 +42,26 @@
                             <version>1.18.24</version>
                         </path>
                     </annotationProcessorPaths>
+                    <!-- 编译后保持方法形参名称不变 -->
+                    <compilerArgs>
+                        <arg>-parameters</arg>
+                    </compilerArgs>
                 </configuration>
+            </plugin>
+
+            <!-- 在打好的jar包中保留javadoc注释,实际会另外生成一个xxxxx-sources.jar -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>2.4</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
 

@@ -117,6 +117,10 @@ MVCI has only passed testing under **Java17**. It may work in lower version of J
 
 ## Changelog
 
+### 17.5.0
+
+* now source files would be included when compiling
+
 ### 17.4.0
 
 * minor code improvements
