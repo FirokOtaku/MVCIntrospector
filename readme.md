@@ -78,31 +78,26 @@
 
 _17.2.0_ 版本之后的 MVCI 在参与编译时会在 `firok.spring.mvci.runtime` 包下生成数个类,  
 操作这些类可以获取本项目中所有标注了 `@MVCIntrospective` 注解并生成了相应结构的实体信息.
+( 17.6.0 版本开始, 为了兼容 Java 模块化,
+`firok.spring.mvci` 模块不再直接包含
+`firok.spring.mvci.runtime` 包.
+这些辅助类的结构和注释都转移到了 `firok.spring.mvci.comment` 包 )
 
-`Current XXX Names` 以字符串方式储存了对应结构的完整限定名;  
+`Current XXX Names` 以字符串方式储存了对应结构的完整限定名.  
 `Current XXX Classes` 储存了对应结构的 Class 对象.
-
-> **为什么要以两种方式储存信息**
->
-> 根据 [虚拟机规范(Java SE 17)对类初始化的描述](https://docs.oracle.com/javase/specs/jls/se17/html/jls-12.html#:~:text=12.4.1.%C2%A0-,When%20Initialization%20Occurs,-A%20class%20or),  
-> 某个类初次实例化之前或其静态字段初次被主动引用之前,  
-> 此类一定会先进行类初始化.  
-> GraalVM 下经测试,  
-> 仅是访问某个类的 Class 对象不会触发其类加载.
->
-> 为了避免不同编译器或解释器实现可能出现的不同实现,  
-> MVCI 仍储存了一份字符串类型的信息,  
-> 以完全避免期望之外的类加载.
+`Current XXX s` 是一个包含了各结构的 Spring Config 类,
+默认情况下此 Config 不会注入到 Spring Context,
+需要将 `firok.spring.mvci.runtime.enable-xxx-config` 设为 `true` 并使用 `@ComponentScan` 手动设置 Spring 组件扫描,
+或自行创建一个子类并注入到 Spring Context.
 
 ## 注意
 
 ### 关于代码生成模板
 
-**MVCI 本身** 不基于 SpringBoot 和 MybatisPlus,  
-但是 **MVCI 默认的结构代码模板** 基于 SpringBoot 和 MybatisPlus.    
-所以默认情况下需为编译环境引入相关依赖, 否则项目无法通过编译.
-
-此外, 还需要正确提供数据库驱动等依赖, 否则项目可能无法正常运行.
+**MVCI 本身** 的依赖非常有限,
+仅引入了少数几个 Spring 组件用于提供增强功能.
+但是 **MVCI 默认的结构代码模板** 基于 SpringBoot 和 MybatisPlus,
+所以默认情况下需在编译环境引入相关依赖, 否则项目无法通过编译.
 
 ### 关于运行时数据类
 
@@ -123,6 +118,11 @@ MVCI 17.x 仅于 **Java17 环境** 下通过测试.
 更低 Java 版本中仍可能使用, 但是您需要手动调整 `firok.spring.mvci.MVCIntrospectProcessor` 上的 `@SupportedSourceVersion` 注解值和部分 MVCI 代码.
 
 ## 变动记录
+
+### 17.6.0
+
+* 新增运行时数据类用于收集 mapper, service, service impl, controller
+* 新增 Java 模块化支持
 
 ### 17.5.0
 

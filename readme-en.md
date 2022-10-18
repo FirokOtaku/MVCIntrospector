@@ -75,9 +75,16 @@ Except default replacing-key-value-pairs, you could create custom ones by editin
 
 After version _17.2.0_ MVCI would generate some classes under `firok.spring.mvci.runtime` package,  
 which contains information about all bean-classes marked with `@MVCIntrospective` and related structures.
+( After 17.6.0, MVCI module no longer contains package `firok.spring.mvci.runtime`.
+All its contents are moved to package `firok.spring.mvci.comment`
+to provide support of Java module system)
 
 `Current XXX Names` store full qualified names of related classes;  
 `Current XXX Classes` store Class instances of related classes.
+`Current XXX s` store all instances of related structures help you
+quickly get all of them rather than read them via Spring Context api.
+If needed, you should set `firok.spring.mvci.runtime.enable-xxx-config` to `true`
+in your config file and add `@ComponentScan` annotation.
 
 > **Why we store information in two different ways**
 > 
@@ -93,10 +100,16 @@ which contains information about all bean-classes marked with `@MVCIntrospective
 
 ### Code template
 
-**MVCI itself** is not based on SpringBoot and MybatisPlus. But **the default templates used by MVCI** is based on SpringBoot and MybatisPlus.  
-By default, you should import them as dependencies, or the project will not pass the compilation.
+**MVCI itself** has very limited amount of dependencies.
 
-In addition, you need to properly import dependencies such as database drivers, or your project may not work properly.
+Only a few Spring components have been referenced
+to provide enhancements.
+
+But **the default templates used by MVCI**
+is based on SpringBoot and MybatisPlus and so on.
+
+By default, you should import them as dependencies,
+or the project will not pass the compilation.
 
 ### Runtime information classes
 
@@ -116,6 +129,11 @@ and `#getByFullQualifiedBeanName` would return `null` when passing full qualifie
 MVCI has only passed testing under **Java17**. It may work in lower version of Java. But you may need to edit the `@SupportedSourceVersion` value of `firok.spring.mvci.MVCIntrospectProcessor` and some code of MVCI.
 
 ## Changelog
+
+### 17.6.0
+
+* add more runtime helper class
+* add Java module support
 
 ### 17.5.0
 

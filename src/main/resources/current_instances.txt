@@ -1,0 +1,27 @@
+package firok.spring.mvci.runtime;
+
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.beans.factory.annotation.Autowired;
+
+@Configuration
+@ConditionalOnExpression("${firok.spring.mvci.runtime.##CONFIG_KEY##:false}")
+public class Current##TYPE_CLASS##s
+{
+##FIELD_INSTANCES##
+	public Object getByFullQualifiedBeanName(String fullQualifiedBeanName)
+	{
+		return switch (fullQualifiedBeanName)
+		{
+##SWITCHES_INSTANCES##
+			default -> null;
+		};
+	}
+
+	public Object[] getAllInstances()
+	{
+	    return new Object[] {
+##ARRAY_INSTANCES##
+	    };
+	}
+}

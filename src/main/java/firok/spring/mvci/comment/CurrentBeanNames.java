@@ -1,4 +1,4 @@
-package firok.spring.mvci.runtime;
+package firok.spring.mvci.comment;
 
 /**
  * @since 17.2.0
