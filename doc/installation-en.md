@@ -35,3 +35,5 @@ and re-build project.
 Then you could see the effects.
 
 [Configuration](config.md)
+
+[Home](home-en.md)

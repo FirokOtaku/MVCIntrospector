@@ -21,3 +21,5 @@ is based on SpringBoot and MybatisPlus and so on.
 
 By default, you should import them as dependencies,
 or the project will not pass the compilation.
+
+[Home](home-en.md)

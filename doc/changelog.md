@@ -1,5 +1,7 @@
 # 变更日志
 
+[文档首页](home.md)
+
 ## 17.6.0
 
 * 新增运行时数据类用于收集 mapper, service, service impl, controller

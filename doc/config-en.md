@@ -151,3 +151,11 @@ public class UserBean
 
 Then the `UserController` will only have one method `testMethod`  
 with return value `"test-data"`.
+
+[Runtime Helper Classes](runtime-classes-en.md)
+
+[Template and Replacement](template-and-replacement-en.md)
+
+[Note](note-en.md)
+
+[Home](home-en.md)

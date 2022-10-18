@@ -13,3 +13,5 @@ for you at compile phase.
 
 
 [Installation](installation-en.md)
+
+[Home](home-en.md)

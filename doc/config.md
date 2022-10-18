@@ -146,3 +146,11 @@ public class UserBean
 
 此时生成的 `UserController` 便只包含一个 `testMethod`,  
 其返回值是 `"test-data"`.
+
+[运行时辅助类](runtime-classes.md)
+
+[调整生成模板](template-and-replacement.md)
+
+[注意](note.md)
+
+[文档首页](home.md)

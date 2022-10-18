@@ -9,3 +9,5 @@ mapper + service + service impl + controller.
 MVCI 便会在编译时自动帮你创建这些类结构.
 
 [安装](installation.md)
+
+[文档首页](home.md)

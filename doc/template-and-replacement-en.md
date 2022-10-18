@@ -52,3 +52,5 @@ Then
 * `a.b.c.TestBean` ← `##TEST## = "test3"`
 * `a.b.c.Test2Bean` ← `##TEST## = "test2"`
 * `a.b.DemoBean` ← `##TEST## = "test"`
+
+[Home](home-en.md)

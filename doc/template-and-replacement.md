@@ -52,3 +52,5 @@
 * 生成 `a.b.c.TestBean` 实体时将使用 `##TEST## = "test3"`
 * 生成 `a.b.c.Test2Bean` 实体时将使用 `##TEST## = "test2"`
 * 生成 `a.b.DemoBean` 实体时将使用 `##TEST## = "test"`
+
+[文档首页](home.md)
