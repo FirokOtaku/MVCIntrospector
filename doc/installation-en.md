@@ -34,6 +34,6 @@ Create JavaBean(s) marked with `@BeanIntrospective` for database table(s)
 and re-build project.
 Then you could see the effects.
 
-[Configuration](config.md)
+[Configuration](config-en.md)
 
 [Home](home-en.md)
