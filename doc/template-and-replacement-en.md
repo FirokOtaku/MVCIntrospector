@@ -1,5 +1,10 @@
 # Modify templates
 
+Default templates (of mapper, service, serviceImpl and controller)
+are based on MybatisPlus. If needed, you could
+change values of `@MVCIntrospective` fields (`templateMapperContent`, `templateServiceContent`,
+`templateServiceImplContent`, `templateControllerContent`) to replace default templates.
+
 > default templates are stored in `resources` folder
 
 When customizing templates,

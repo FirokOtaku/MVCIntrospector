@@ -1,5 +1,10 @@
 # 调整生成模板
 
+各结构 (mapper, service, serviceImpl, controller)
+默认的生成模板基于 MybatisPlus, 如果有需要,
+可以为 `@MVCIntrospective` 的 `templateMapperContent`, `templateServiceContent`,
+`templateServiceImplContent`, `templateControllerContent` 字段传入字符串替换默认模板.
+
 > 默认的模板存放在 `resources` 目录下
 
 根据模板生成内容时, 如下键会被替换:
