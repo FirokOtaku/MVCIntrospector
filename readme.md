@@ -14,3 +14,7 @@ MVCI could help you generate whole set of CRUD structures
 for your SpringBoot project during compiling phase.
 
 [Documentation - English](doc/home-en.md)
+
+----
+
+> ![lgpl3](https://www.gnu.org/graphics/lgplv3-147x51.png)
