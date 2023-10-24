@@ -55,6 +55,8 @@ import static firok.spring.mvci.Constants.*;
 @Target({ElementType.TYPE, ElementType.PACKAGE})
 public @interface MVCIntrospective
 {
+	@Deprecated(forRemoval = true)
+	String Version = "17.7.0";
 
 	/**
 	 * <p>包含若干键值对数据, 生成结构时将会按顺序遍历此列表替换模板内容.</p>

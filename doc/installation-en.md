@@ -2,9 +2,9 @@
 
 * Import MVCI as dependency.  
   Following methods are available:
-  * `clone repo` and `mvn install`
-  * Download pre-built .jar from [GitHub releases](https://github.com/FirokOtaku/MVCIntrospector/releases).
-  * Use GitHub Maven Packages
+  1. `clone repo` and `mvn install`
+  2. Download pre-built .jar from [GitHub releases](https://github.com/FirokOtaku/MVCIntrospector/releases)
+  3. Use GitHub Maven Packages
     ```xml
     <repositories>
       <repository>

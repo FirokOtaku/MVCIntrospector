@@ -2,9 +2,9 @@
 
 * 在项目中引入依赖.  
   目前可以使用如下方式:
-  * `clone repo` 并 `mvn install`
-  * 从 [GitHub releases](https://github.com/FirokOtaku/MVCIntrospector/releases) 下载编译好的 .jar;
-  * 使用 GitHub Maven Packages
+  1. `clone repo` 并 `mvn install`
+  2. 从 [GitHub releases](https://github.com/FirokOtaku/MVCIntrospector/releases) 下载编译好的 .jar
+  3. 使用 GitHub Maven Packages
     ```xml
     <repositories>
       <repository>

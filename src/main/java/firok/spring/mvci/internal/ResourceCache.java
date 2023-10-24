@@ -11,11 +11,12 @@ public class ResourceCache
 	private static final Map<String, String> mapCachedResources = new ConcurrentHashMap<>();
 	public static String getResourceString(String location)
 	{
+		var fullPath = "/firok/spring/mvci/" + location + ".txt";
 		return mapCachedResources.computeIfAbsent(location, loc -> {
 			var ret = new StringBuilder();
 			try(var is = Objects.requireNonNull(
-					BeanContext.class.getClassLoader().getResourceAsStream(location + ".txt"),
-					"resource not found: "+location
+					BeanContext.class.getResourceAsStream(fullPath),
+					"resource not found: " + fullPath
 			);
 			    var in = new Scanner(is)
 			) {

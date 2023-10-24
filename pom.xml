@@ -6,7 +6,7 @@
 
     <groupId>firok.spring</groupId>
     <artifactId>mvci</artifactId>
-    <version>17.6.0</version>
+    <version>17.7.0</version>
     <description>An annotation processing tool to generate MVC code from JavaBean(s).</description>
     <dependencies>
         <dependency>
@@ -82,7 +82,7 @@
             <resource>
                 <directory>${basedir}/src/main/resources</directory>
                 <includes>
-                    <include>*.txt</include>
+                    <include>**/*.txt</include>
                 </includes>
             </resource>
         </resources>
